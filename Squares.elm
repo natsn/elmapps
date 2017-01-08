@@ -41,16 +41,16 @@ update msg model =
     in
         case msg of
             SetSquareSize s ->
-                ( { model | squareSize = (sq 10 s) }, Cmd.none )
+                ( { model | squareSize = (sq model.squareSize s) }, Cmd.none )
 
             SetMargin s ->
-                ( { model | squareMargin = (sq 1 s) }, Cmd.none )
+                ( { model | squareMargin = (sq model.squareMargin s) }, Cmd.none )
 
             SetBoardSize s ->
-                if (sq 5 s) > 20 then
+                if (sq 5 s) > 100 then
                     ( { model | warning = "That's too big" }, Cmd.none )
                 else
-                    ( { model | boardSize = (sq 5 s) }, Cmd.none )
+                    ( { model | boardSize = (sq model.boardSize s), warning = "" }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -84,27 +84,24 @@ view model =
         square =
             div [ style squareStyles ] []
 
-        placeBoard =
-            (toString model.boardSize)
-
-        placeMargin =
-            (toString model.squareMargin)
-
-        placeSquare =
-            (toString model.squareSize)
-
-        settings msg label =
+        settings msg label num =
             div []
                 [ em [] [ text label ]
-                , input [ onInput msg, placeholder placeBoard ] []
+                , input [ onInput msg, placeholder (toString num) ] []
                 ]
+
+        app =
+            [ ( "background", "-webkit-linear-gradient(top, #ff8989 0%,#ffffff 100%)" )
+            , ( "padding", "10px" )
+            , ( "margin", "20px" )
+            ]
     in
-        div []
-            [ h1 [] [ text "squares (be careful)" ]
+        div [ style app ]
+            [ h1 [ style [ ( "color", "#FF2B2B" ) ] ] [ text "THE GREAT GRID MAKING MACHINE" ]
             , p [] [ text model.warning ]
-            , (settings SetBoardSize "board size: ")
-            , (settings SetMargin "margins: ")
-            , (settings SetSquareSize "square size: ")
-            , em [] [ text model.settings ]
+            , (settings SetBoardSize "board: " model.boardSize)
+            , (settings SetSquareSize "square: " model.squareSize)
+            , (settings SetMargin "margins: " model.squareMargin)
+            , br [] []
             , div [ style boardStyles ] (List.repeat (model.boardSize ^ 2) square)
             ]
