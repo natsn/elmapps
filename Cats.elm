@@ -31,7 +31,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "waiting.gif" "cats", Cmd.none )
+    ( Model "waiting.gif" "FOO", Cmd.none )
 
 
 view : Model -> Html.Html Msg
