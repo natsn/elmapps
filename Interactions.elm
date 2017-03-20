@@ -4,16 +4,15 @@ import Html exposing (..)
 import Html.Attributes as Attr exposing (..)
 import Time
 import Mouse
+import Task
 
 
 -- record the time the mouse event is clicked
--- record where they clicked
-
 
 type alias Model =
     { x : Int
     , y : Int
-    , clickTimes : List Int
+    , clickTimes : List Time.Time
     }
 
 initModel : Model
@@ -23,17 +22,36 @@ initModel =
     , clickTimes = []
     }
 
+
+viewXY x y =
+        ul [] [li [] [text <| "X: " ++ (toString x)]
+              , li [] [text <| "Y: " ++ (toString y)]
+              ]
+
+viewClickTimes clickTimes =
+        p [] [text (toString clickTimes)]
+
 view : Model -> Html Msg
 view model =
-    div [] [ text "here we go" ]
+    div [] [ h1 [] [text "where & when did you click?"]
+           , viewXY model.x model.y
+           , viewClickTimes model.clickTimes ]
 
-type Msg = Click Mouse.Position
+type Msg
+      = Click Mouse.Position
+      | ClickTime Time.Time
+
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         Click pos ->
-                ({model | x = pos.x, y = pos.y }, Cmd.none)
+                ({model | x = pos.x, y = pos.y }, Task.perform ClickTime Time.now)
+        ClickTime time ->
+                let
+                    clickTimes_ = model.clickTimes
+                in
+                    ({model | clickTimes = time::clickTimes_}, Cmd.none)
 
 
 subscriptions model =
